@@ -34,24 +34,31 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .search-box { padding: 7px 12px; border-radius: 20px; border: 1px solid var(--border2); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); width: 160px; outline: none; }
 .btn-add { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .orders-list { display: flex; flex-direction: column; gap: 10px; }
-.order-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: center; }
-.order-card.dispatched { opacity: 0.55; }
-.order-id-badge { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); background: var(--surface2); border-radius: var(--radius-sm); padding: 4px 8px; white-space: nowrap; }
+.order-card { background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 14px 16px; display: grid; grid-template-columns: auto 1fr auto auto; gap: 12px; align-items: start; }
+.order-id-badge { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); background: var(--surface2); border-radius: var(--radius-sm); padding: 4px 8px; white-space: nowrap; margin-top: 2px; }
 .order-customer { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
 .order-detail { font-size: 12px; color: var(--text2); display: flex; gap: 10px; flex-wrap: wrap; }
 .order-meta { text-align: right; }
 .order-date { font-size: 12px; color: var(--text3); margin-bottom: 4px; }
 .urgent-pill { display: inline-block; font-size: 10px; font-weight: 600; background: var(--red-light); color: var(--accent); border-radius: 4px; padding: 2px 7px; text-transform: uppercase; }
+.order-actions { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
 .status-select { padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface2); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; outline: none; min-width: 148px; }
 .status-select.s-pending   { background: var(--amber-light); color: #7D4A00; border-color: #E6B97A; }
 .status-select.s-production{ background: var(--blue-light);  color: #1A5276; border-color: #7FB3D3; }
 .status-select.s-ready     { background: var(--green-light); color: #1A5E35; border-color: #82D4A4; }
 .status-select.s-dispatched{ background: var(--gray-light);  color: var(--text2); border-color: var(--border2); }
 .status-select.s-delayed   { background: var(--red-light);   color: #7B241C; border-color: #E59A9A; }
+.action-btns { display: flex; gap: 6px; }
+.btn-edit { font-size: 11px; padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface2); color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-edit:hover { background: var(--blue-light); color: #1A5276; border-color: #7FB3D3; }
+.btn-delete { font-size: 11px; padding: 4px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border2); background: var(--surface2); color: var(--text2); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.btn-delete:hover { background: var(--red-light); color: var(--accent); border-color: #E59A9A; }
 .notes-toggle { font-size: 11px; color: var(--text3); background: none; border: none; cursor: pointer; margin-top: 4px; display: block; }
 .notes-text { font-size: 12px; color: var(--text2); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); display: none; }
 .notes-text.visible { display: block; }
 .empty-state { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 14px; }
+.dispatched-toggle { font-size: 13px; color: var(--text2); background: none; border: 1px solid var(--border2); border-radius: 20px; padding: 5px 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.dispatched-toggle.showing { background: var(--gray-light); }
 .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
 .modal-backdrop.open { display: flex; }
 .modal { background: var(--surface); border-radius: 16px; padding: 28px 28px 24px; width: 100%; max-width: 480px; box-shadow: var(--shadow-md); max-height: 90vh; overflow-y: auto; }
@@ -102,10 +109,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="chip" data-filter="pending">Pending</div>
       <div class="chip" data-filter="production">In production</div>
       <div class="chip" data-filter="ready">Ready</div>
-      <div class="chip" data-filter="dispatched">Dispatched</div>
       <div class="chip" data-filter="delayed">Delayed</div>
     </div>
     <input class="search-box" type="text" id="search" placeholder="Search...">
+    <button class="dispatched-toggle" id="dispatched-toggle">Show dispatched</button>
     <button class="btn-add" id="new-order-btn">+ New order</button>
   </div>
   <div class="orders-list" id="orders-list">
@@ -158,7 +165,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 <div class="saving-indicator" id="saving-indicator">Saving...</div>
 <script>
 const DB_URL = 'https://super-pipe-orders-default-rtdb.firebaseio.com';
-let allOrders = [], currentFilter = 'all', editingId = null;
+let allOrders = [], currentFilter = 'all', editingId = null, showDispatched = false;
 
 async function loadOrders() {
   try {
@@ -193,23 +200,39 @@ async function updateOrderInDb(key, data) {
   showSaving(false);
 }
 
+async function deleteOrderFromDb(key) {
+  if (!confirm('Are you sure you want to delete this order? This cannot be undone.')) return;
+  showSaving(true);
+  try {
+    await fetch(DB_URL + '/orders/' + key + '.json', { method: 'DELETE' });
+    await loadOrders();
+  } catch(e) { alert('Could not delete order.'); }
+  showSaving(false);
+}
+
 function showSaving(v) { document.getElementById('saving-indicator').classList.toggle('show', v); }
 
 function render() {
   const search = document.getElementById('search').value.toLowerCase();
   const so = { delayed:0, ready:1, production:2, pending:3, dispatched:4 };
-  const list = allOrders
-    .filter(o => (currentFilter==='all'||o.status===currentFilter) && (!search||o.customer?.toLowerCase().includes(search)||o.product?.toLowerCase().includes(search)))
-    .sort((a,b) => (so[a.status]??5)-(so[b.status]??5));
+  let list = allOrders.filter(o => {
+    if (!showDispatched && o.status === 'dispatched') return false;
+    if (currentFilter !== 'all' && o.status !== currentFilter) return false;
+    if (search && !o.customer?.toLowerCase().includes(search) && !o.product?.toLowerCase().includes(search)) return false;
+    return true;
+  }).sort((a,b) => (so[a.status]??5)-(so[b.status]??5));
+
   const today = new Date().toISOString().slice(0,10);
-  document.getElementById('s-total').textContent = allOrders.length;
+  document.getElementById('s-total').textContent = allOrders.filter(o => o.status !== 'dispatched').length;
   document.getElementById('s-prod').textContent = allOrders.filter(o=>o.status==='production').length;
   document.getElementById('s-ready').textContent = allOrders.filter(o=>o.status==='ready').length;
   document.getElementById('s-done').textContent = allOrders.filter(o=>o.status==='dispatched'&&o.date===today).length;
+
   const container = document.getElementById('orders-list');
   if (!list.length) { container.innerHTML = '<div class="empty-state">No orders found</div>'; return; }
+
   container.innerHTML = list.map(o => `
-    <div class="order-card ${o.status==='dispatched'?'dispatched':''}">
+    <div class="order-card">
       <div class="order-id-badge">${o.orderId||'—'}</div>
       <div>
         <div class="order-customer">${o.customer||'—'}</div>
@@ -225,16 +248,29 @@ function render() {
         <div class="order-date">${o.deadline||''}</div>
         ${o.priority==='urgent'?'<span class="urgent-pill">Urgent</span>':''}
       </div>
-      <select class="status-select s-${o.status}" data-key="${o._key}">
-        <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
-        <option value="production" ${o.status==='production'?'selected':''}>In production</option>
-        <option value="ready" ${o.status==='ready'?'selected':''}>Ready to dispatch</option>
-        <option value="dispatched" ${o.status==='dispatched'?'selected':''}>Dispatched</option>
-        <option value="delayed" ${o.status==='delayed'?'selected':''}>Delayed</option>
-      </select>
+      <div class="order-actions">
+        <select class="status-select s-${o.status}" data-key="${o._key}">
+          <option value="pending" ${o.status==='pending'?'selected':''}>Pending</option>
+          <option value="production" ${o.status==='production'?'selected':''}>In production</option>
+          <option value="ready" ${o.status==='ready'?'selected':''}>Ready to dispatch</option>
+          <option value="dispatched" ${o.status==='dispatched'?'selected':''}>Dispatched</option>
+          <option value="delayed" ${o.status==='delayed'?'selected':''}>Delayed</option>
+        </select>
+        <div class="action-btns">
+          <button class="btn-edit" data-key="${o._key}">✏️ Edit</button>
+          <button class="btn-delete" data-key="${o._key}">🗑 Delete</button>
+        </div>
+      </div>
     </div>`).join('');
+
   container.querySelectorAll('.status-select').forEach(sel => {
     sel.addEventListener('change', () => updateOrderInDb(sel.dataset.key, { status: sel.value }));
+  });
+  container.querySelectorAll('.btn-edit').forEach(btn => {
+    btn.addEventListener('click', () => openModal(btn.dataset.key));
+  });
+  container.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', () => deleteOrderFromDb(btn.dataset.key));
   });
   container.querySelectorAll('.notes-toggle').forEach(btn => {
     btn.addEventListener('click', () => document.getElementById('notes-'+btn.dataset.key)?.classList.toggle('visible'));
@@ -249,10 +285,22 @@ document.querySelectorAll('.chip').forEach(chip => {
     render();
   });
 });
+
+document.getElementById('dispatched-toggle').addEventListener('click', () => {
+  showDispatched = !showDispatched;
+  const btn = document.getElementById('dispatched-toggle');
+  btn.textContent = showDispatched ? 'Hide dispatched' : 'Show dispatched';
+  btn.classList.toggle('showing', showDispatched);
+  render();
+});
+
 document.getElementById('search').addEventListener('input', render);
 document.getElementById('new-order-btn').addEventListener('click', () => openModal(null));
 document.getElementById('cancel-btn').addEventListener('click', closeModal);
-document.getElementById('modal-backdrop').addEventListener('click', e => { if(e.target===document.getElementById('modal-backdrop')) closeModal(); });
+document.getElementById('modal-backdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-backdrop')) closeModal();
+});
+
 document.getElementById('save-btn').addEventListener('click', async () => {
   const customer = document.getElementById('f-customer').value.trim();
   const product = document.getElementById('f-product').value;
@@ -266,20 +314,32 @@ document.getElementById('save-btn').addEventListener('click', async () => {
     address: document.getElementById('f-address').value.trim(),
     priority: document.getElementById('f-priority').value,
     notes: document.getElementById('f-notes').value.trim(),
-    date: today, orderId: 'ORD-'+Date.now().toString().slice(-5),
-    status: 'pending', createdAt: Date.now(),
+    date: today,
   };
-  closeModal();
-  await saveOrderToDb(data);
+  if (editingId) {
+    closeModal();
+    await updateOrderInDb(editingId, data);
+  } else {
+    data.orderId = 'ORD-' + Date.now().toString().slice(-5);
+    data.status = 'pending';
+    data.createdAt = Date.now();
+    closeModal();
+    await saveOrderToDb(data);
+  }
 });
 
 function openModal(key) {
   editingId = key;
   const o = key ? allOrders.find(x=>x._key===key) : null;
   document.getElementById('modal-title').textContent = key ? 'Edit order' : 'New order';
-  ['customer','contact','product','qty','deadline','address','priority','notes'].forEach(f => {
-    document.getElementById('f-'+f).value = o?.[f] || (f==='priority'?'standard':'');
-  });
+  document.getElementById('f-customer').value = o?.customer||'';
+  document.getElementById('f-contact').value = o?.contact||'';
+  document.getElementById('f-product').value = o?.product||'';
+  document.getElementById('f-qty').value = o?.qty||'';
+  document.getElementById('f-deadline').value = o?.deadline||'';
+  document.getElementById('f-address').value = o?.address||'';
+  document.getElementById('f-priority').value = o?.priority||'standard';
+  document.getElementById('f-notes').value = o?.notes||'';
   document.getElementById('modal-backdrop').classList.add('open');
   document.getElementById('f-customer').focus();
 }
